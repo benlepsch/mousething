@@ -8,21 +8,20 @@ socketio = SocketIO(app)
 @app.route('/')
 @app.route('/index')
 def index():
-    print('im losing it')
+    # print('im losing it')
     return render_template('index.html')
 
-points = []
-
-def remove_point(id):
-    for p in points:
-        if p[2] == id:
-            points.remove(p)
-            return 1
-    return 0
+points = {}
 
 @socketio.on('new data')
-def take_data(message):
-    print(message)
+def take_data(msg):
+    points[request.sid] = (msg['x'], msg['y'])
+
+    emit('boo', {
+            'id': request.sid, 
+            'x': msg['x'], 
+            'y': msg['y']
+        }, broadcast=True)
 
 
 if __name__ == '__main__':
